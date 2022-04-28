@@ -52,6 +52,7 @@ chrome.runtime.onMessage.addListener(
             if (!isBuyTab(activeTab)) {
                 await select(buyTab);
             }
+            return;
         }
 
         theOnlyOneSellTab = sender.tab;
