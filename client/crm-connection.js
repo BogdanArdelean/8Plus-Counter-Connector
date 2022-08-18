@@ -3,6 +3,16 @@ const _8PLUS_WS_SERVER = 'ws://localhost:8001';
 // Create WebSocket connection.
 let socket;
 
+async function getScriptTab() {
+    return await chrome.tabs.getCurrent();
+}
+
+async function isScriptTabActive() {
+    const scriptTab = await getScriptTab();
+    
+    return scriptTab.active;
+}
+
 function isSellPage() {
     const url = document.URL;
     return url.indexOf('vanzare.php') > -1;
@@ -30,9 +40,12 @@ function updateSelling(data) {
     sumInput.dispatchEvent(new KeyboardEvent('keydown', {keyCode: 9}));
 }
 
-function processBills({data}) {
+async function processBills({data}) {
+    if (!await isScriptTabActive()) {
+        return;
+    }
+    
     const parsedData = JSON.parse(data);
-
     if (isSellPage()) {
         updateSelling(parsedData)
     } else {
