@@ -8,32 +8,36 @@ function isSellPage() {
     return url.indexOf('vanzare.php') > -1;
 }
 
-function notifyBackgroundOfData(data) {
-    chrome.runtime.sendMessage(data);
-}
-
-function updatePage(data) {
+function updateBuying(data) {
     const currencySelect = document.querySelector('#primitmoneda');
-    console.log(currencySelect);
     currencySelect.focus();
     currencySelect.value = data.currency;
-    currencySelect.dispatchEvent(new KeyboardEvent('keydown', {keyCode: 9}));
-    console.log('here');
+    currencySelect.dispatchEvent(new Event('change'));
 
     const sumInput = document.querySelector('#sumaprimita');
-    console.log(sumInput);
+    sumInput.value = parseInt(data.total);
+    sumInput.dispatchEvent(new KeyboardEvent('keydown', {keyCode: 9}));
+}
+
+function updateSelling(data) {
+    const currencySelect = document.querySelector('#predatmoneda');
+    currencySelect.focus();
+    currencySelect.value = data.currency;
+    currencySelect.dispatchEvent(new Event('change'));
+
+    const sumInput = document.querySelector('#sumapredata');
     sumInput.value = parseInt(data.total);
     sumInput.dispatchEvent(new KeyboardEvent('keydown', {keyCode: 9}));
 }
 
 function processBills({data}) {
-    notifyBackgroundOfData(data);
-    
-    if (isSellPage()) {
-        return;
-    }
+    const parsedData = JSON.parse(data);
 
-    updatePage(JSON.parse(data));
+    if (isSellPage()) {
+        updateSelling(parsedData)
+    } else {
+        updateBuying(parsedData);
+    }
 } 
 
 function connectToServer() {
@@ -50,13 +54,5 @@ function connectToServer() {
         processBills(event);
     }
 }
-
-chrome.runtime.onMessage.addListener(
-    function(data, sender, sendResponse) {
-        if (isSellPage()) return;
-
-        updatePage(JSON.parse(data));
-    }
-);
 
 connectToServer();

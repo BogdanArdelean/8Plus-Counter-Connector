@@ -3,9 +3,6 @@
     "description": "Extension for the Exchange CRM software",
     "version": "1.0",
     "manifest_version": 3,
-    "background": {
-      "service_worker": "background.js"
-    },
     "content_scripts": [
         {
             "matches": ["file://*", "http://*/*/cumparare.php","http://*/*/vanzare.php"],
